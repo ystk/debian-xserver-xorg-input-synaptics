@@ -18,9 +18,12 @@
 #  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 #  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-AUTOMAKE_OPTIONS = foreign
-SUBDIRS = include src man tools conf
 
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = xorg-synaptics.pc
+if HAS_XORG_CONF_DIR
+confdir = $(XORG_CONF_DIR)
+dist_conf_DATA = 50-synaptics.conf
+else
 
+EXTRA_DIST = 11-x11-synaptics.fdi
+
+endif
