@@ -27,22 +27,28 @@
 #ifndef _SYNPROTO_H_
 #define _SYNPROTO_H_
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <xf86Xinput.h>
 #include <xisb.h>
 
-#include "config.h"
+#ifndef XI86_SERVER_FD
+#define XI86_SERVER_FD 0x20
+#endif
 
 struct _SynapticsPrivateRec;
 typedef struct _SynapticsPrivateRec SynapticsPrivate;
 
 enum SynapticsSlotState {
-    SLOTSTATE_EMPTY = 0,
-    SLOTSTATE_OPEN,
-    SLOTSTATE_CLOSE,
-    SLOTSTATE_OPEN_EMPTY,
-    SLOTSTATE_UPDATE,
+    SLOTSTATE_EMPTY = 0,        /* no slot in this cycle */
+    SLOTSTATE_OPEN,             /* tracking ID received */
+    SLOTSTATE_CLOSE,            /* tracking ID -1 received */
+    SLOTSTATE_OPEN_EMPTY,       /* previously had tracking id, no events in this read cycle */
+    SLOTSTATE_UPDATE,           /* had tracking id, other events in this cycle */
 };
 
 /* used to mark emulated hw button state */
@@ -69,11 +75,9 @@ struct SynapticsHwState {
     Bool multi[8];
     Bool middle;                /* Some ALPS touchpads have a middle button */
 
-#ifdef HAVE_MULTITOUCH
     int num_mt_mask;
     ValuatorMask **mt_mask;
     enum SynapticsSlotState *slot_state;
-#endif
 };
 
 struct CommData {
@@ -122,7 +126,7 @@ extern void SynapticsCopyHwState(struct SynapticsHwState *dst,
                                  const struct SynapticsHwState *src);
 extern void SynapticsResetHwState(struct SynapticsHwState *hw);
 extern void SynapticsResetTouchHwState(struct SynapticsHwState *hw,
-                                       Bool force_empty);
+                                       Bool set_slot_empty);
 
 extern Bool SynapticsIsSoftButtonAreasValid(int *values);
 

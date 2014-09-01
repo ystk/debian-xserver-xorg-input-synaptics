@@ -23,7 +23,18 @@
 #define _SYNAPTICSSTR_H_
 
 #include "synproto.h"
-#include <xserver-properties.h>
+
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) < 18
+#define LogMessageVerbSigSafe xf86MsgVerb
+#endif
+
+#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) > 19
+#define NO_DRIVER_SCALING 1
+#elif GET_ABI_MAJOR(ABI_XINPUT_VERSION) == 19 && GET_ABI_MINOR(ABI_XINPUT_VERSION) >= 2
+/* as of 19.2, the server takes device resolution into account when scaling
+   relative events from abs device, so we must not scale in synaptics. */
+#define NO_DRIVER_SCALING 1
+#endif
 
 #ifdef DBG
 #undef DBG
@@ -36,20 +47,42 @@
 #define DBG(verb, msg, ...)     /* */
 #endif
 
-#if GET_ABI_MAJOR(ABI_XINPUT_VERSION) < 12
-#define xf86IDrvMsg(pInfo, type, ...) xf86Msg(type, __VA_ARGS__)
-#endif
-
-#ifdef AXIS_LABEL_PROP_REL_VSCROLL
-#define HAVE_SMOOTH_SCROLL
-#endif
-
 /******************************************************************************
  *		Definitions
  *					structs, typedefs, #defines, enums
  *****************************************************************************/
 #define SYNAPTICS_MOVE_HISTORY	5
 #define SYNAPTICS_MAX_TOUCHES	10
+#define SYN_MAX_BUTTONS 12      /* Max number of mouse buttons */
+
+/* Minimum and maximum values for scroll_button_repeat */
+#define SBR_MIN 10
+#define SBR_MAX 1000
+
+enum OffState {
+    TOUCHPAD_ON = 0,
+    TOUCHPAD_OFF = 1,
+    TOUCHPAD_TAP_OFF = 2,
+};
+
+enum TapEvent {
+    RT_TAP = 0,                 /* Right top corner */
+    RB_TAP,                     /* Right bottom corner */
+    LT_TAP,                     /* Left top corner */
+    LB_TAP,                     /* Left bottom corner */
+    F1_TAP,                     /* Non-corner tap, one finger */
+    F2_TAP,                     /* Non-corner tap, two fingers */
+    F3_TAP,                     /* Non-corner tap, three fingers */
+    MAX_TAP
+};
+
+enum ClickFingerEvent {
+    F1_CLICK1 = 0,              /* Click left, one finger */
+    F2_CLICK1,                  /* Click left, two fingers */
+    F3_CLICK1,                  /* Click left, three fingers */
+    MAX_CLICK
+};
+
 
 typedef struct _SynapticsMoveHist {
     int x, y;
@@ -73,7 +106,6 @@ enum FingerState {              /* Note! The order matters. Compared with < oper
 enum MovingState {
     MS_FALSE,
     MS_TOUCHPAD_RELATIVE,
-    MS_TRACKSTICK               /* trackstick is always relative */
 };
 
 enum MidButtonEmulation {
@@ -113,7 +145,25 @@ enum TouchpadModel {
     MODEL_SYNAPTICS,
     MODEL_ALPS,
     MODEL_APPLETOUCH,
-    MODEL_ELANTECH
+    MODEL_ELANTECH,
+    MODEL_UNIBODY_MACBOOK
+};
+
+enum SoftButtonAreas {
+    NO_BUTTON_AREA = -1,
+    BOTTOM_BUTTON_AREA = 0,
+    BOTTOM_RIGHT_BUTTON_AREA = 0,
+    BOTTOM_MIDDLE_BUTTON_AREA = 1,
+    TOP_BUTTON_AREA = 2,
+    TOP_RIGHT_BUTTON_AREA = 2,
+    TOP_MIDDLE_BUTTON_AREA = 3
+};
+
+enum SoftButtonAreaEdges {
+    LEFT = 0,
+    RIGHT = 1,
+    TOP = 2,
+    BOTTOM = 3
 };
 
 typedef struct _SynapticsParameters {
@@ -126,7 +176,8 @@ typedef struct _SynapticsParameters {
     int tap_time_2;             /* max. tapping time for double taps */
     int click_time;             /* The duration of a single click */
     Bool clickpad;              /* Device is a has integrated buttons */
-    Bool fast_taps;             /* Faster reaction to single taps */
+    Bool has_secondary_buttons; /* Device has a top soft-button area */
+    int clickpad_ignore_motion_time; /* Ignore motion for X ms after a click */
     int emulate_mid_button_time;        /* Max time between left and right button presses to
                                            emulate a middle button press. */
     int emulate_twofinger_z;    /* pressure threshold to emulate two finger touch (for Alps) */
@@ -139,12 +190,6 @@ typedef struct _SynapticsParameters {
     Bool scroll_twofinger_vert; /* Enable/disable vertical two-finger scrolling */
     Bool scroll_twofinger_horiz;        /* Enable/disable horizontal two-finger scrolling */
     double min_speed, max_speed, accl;  /* movement parameters */
-    double trackstick_speed;    /* trackstick mode speed */
-    int edge_motion_min_z;      /* finger pressure at which minimum edge motion speed is set */
-    int edge_motion_max_z;      /* finger pressure at which maximum edge motion speed is set */
-    int edge_motion_min_speed;  /* slowest setting for edge motion speed */
-    int edge_motion_max_speed;  /* fastest setting for edge motion speed */
-    Bool edge_motion_use_always;        /* If false, edge motion is used only when dragging */
 
     Bool updown_button_scrolling;       /* Up/Down-Button scrolling or middle/double-click */
     Bool leftright_button_scrolling;    /* Left/right-button scrolling, or two lots of middle button */
@@ -179,24 +224,19 @@ typedef struct _SynapticsParameters {
     unsigned int resolution_horiz;      /* horizontal resolution of touchpad in units/mm */
     unsigned int resolution_vert;       /* vertical resolution of touchpad in units/mm */
     int area_left_edge, area_right_edge, area_top_edge, area_bottom_edge;       /* area coordinates absolute */
-    int softbutton_areas[2][4]; /* soft button area coordinates, 0 => right, 1 => middle button */
+    int softbutton_areas[4][4]; /* soft button area coordinates, 0 => right, 1 => middle , 2 => secondary right, 3 => secondary middle button */
     int hyst_x, hyst_y;         /* x and y width of hysteresis box */
 } SynapticsParameters;
 
 struct _SynapticsPrivateRec {
     SynapticsParameters synpara;        /* Default parameter settings, read from
                                            the X config file */
-    SynapticsSHM *synshm;       /* Current parameter settings. Will point to
-                                   shared memory if shm_config is true */
     struct SynapticsProtocolOperations *proto_ops;
     void *proto_data;           /* protocol-specific data */
 
     struct SynapticsHwState *hwState;
-    struct SynapticsHwState *old_hw_state;      /* previous logical hw state */
 
     const char *device;         /* device node */
-    Bool shm_config;            /* True when shared memory area allocated */
-
     CARD32 timer_time;          /* when timer last fired */
     OsTimerPtr timer;           /* for up/down-button repeat, tap processing, etc */
 
@@ -204,7 +244,6 @@ struct _SynapticsPrivateRec {
 
     struct SynapticsHwState *local_hw_state;    /* used in place of local hw state variables */
 
-    Bool absolute_events;       /* post absolute motion events instead of relative */
     SynapticsMoveHistRec move_hist[SYNAPTICS_MOVE_HISTORY];     /* movement history */
     int hist_index;             /* Last added entry in move_hist[] */
     int hyst_center_x;          /* center x of hysteresis */
@@ -227,6 +266,8 @@ struct _SynapticsPrivateRec {
     Bool prev_up;               /* Previous up button value, for double click emulation */
     enum FingerState finger_state;      /* previous finger state */
     CARD32 last_motion_millis;  /* time of the last motion */
+    enum SoftButtonAreas last_button_area;    /* Last button area we were in */
+    int clickpad_click_millis;  /* Time of last clickpad click */
 
     enum TapState tap_state;    /* State of tap processing */
     int tap_max_fingers;        /* Max number of fingers seen since entering start state */
@@ -242,8 +283,6 @@ struct _SynapticsPrivateRec {
     Bool circ_scroll_on;        /* Keeps track of currently active scroll modes */
     Bool circ_scroll_vert;      /* True: Generate vertical scroll events
                                    False: Generate horizontal events */
-    int trackstick_neutral_x;   /* neutral x position for trackstick mode */
-    int trackstick_neutral_y;   /* neutral y position for trackstick mode */
     double frac_x, frac_y;      /* absolute -> relative fraction */
     enum MidButtonEmulation mid_emu_state;      /* emulated 3rd button */
     int repeatButtons;          /* buttons for repeat */
@@ -252,8 +291,10 @@ struct _SynapticsPrivateRec {
     int prev_z;                 /* previous z value, for palm detection */
     int prevFingers;            /* previous numFingers, for transition detection */
     int avg_width;              /* weighted average of previous fingerWidth values */
+#ifndef NO_DRIVER_SCALING
     double horiz_coeff;         /* normalization factor for x coordintes */
     double vert_coeff;          /* normalization factor for y coordintes */
+#endif
 
     int minx, maxx, miny, maxy; /* min/max dimensions as detected */
     int minp, maxp, minw, maxw; /* min/max pressure and finger width as detected */
@@ -272,13 +313,10 @@ struct _SynapticsPrivateRec {
     unsigned short id_vendor;   /* vendor id */
     unsigned short id_product;  /* product id */
 
-#ifdef HAVE_SMOOTH_SCROLL
     int scroll_axis_horiz;      /* Horizontal smooth-scrolling axis */
     int scroll_axis_vert;       /* Vertical smooth-scrolling axis */
     ValuatorMask *scroll_events_mask;   /* ValuatorMask for smooth-scrolling */
-#endif
 
-#ifdef HAVE_MULTITOUCH
     Bool has_touch;             /* Device has multitouch capabilities */
     int max_touches;            /* Number of touches supported */
     int num_mt_axes;            /* Number of multitouch axes other than X, Y */
@@ -286,7 +324,6 @@ struct _SynapticsPrivateRec {
     int num_slots;              /* Number of touch slots allocated */
     int *open_slots;            /* Array of currently open touch slots */
     int num_active_touches;     /* Number of active touches on device */
-#endif
 };
 
 #endif                          /* _SYNAPTICSSTR_H_ */

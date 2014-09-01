@@ -35,7 +35,7 @@
 /* 32 bit, 4 values, left, right, top, bottom */
 #define SYNAPTICS_PROP_EDGES "Synaptics Edges"
 
-/* 32 bit, 3 values, low, high, press */
+/* 32 bit, 3 values, low, high, <deprecated> */
 #define SYNAPTICS_PROP_FINGER "Synaptics Finger"
 
 /* 32 bit */
@@ -72,17 +72,8 @@
 /* 8 bit (BOOL), 2 values, vertical, horizontal */
 #define SYNAPTICS_PROP_SCROLL_TWOFINGER "Synaptics Two-Finger Scrolling"
 
-/* FLOAT, 4 values, min, max, accel, trackstick */
+/* FLOAT, 4 values, min, max, accel, <deprecated> */
 #define SYNAPTICS_PROP_SPEED "Synaptics Move Speed"
-
-/* 32 bit, 2 values, min, max */
-#define SYNAPTICS_PROP_EDGEMOTION_PRESSURE "Synaptics Edge Motion Pressure"
-
-/* 32 bit, 2 values, min, max */
-#define SYNAPTICS_PROP_EDGEMOTION_SPEED "Synaptics Edge Motion Speed"
-
-/* 8 bit (BOOL) */
-#define SYNAPTICS_PROP_EDGEMOTION "Synaptics Edge Motion Always"
 
 /* 8 bit (BOOL), 2 values, updown, leftright */
 #define SYNAPTICS_PROP_BUTTONSCROLLING "Synaptics Button Scrolling"
@@ -160,6 +151,9 @@
 
 /* 32 bit, 4 values, left, right, top, buttom */
 #define SYNAPTICS_PROP_SOFTBUTTON_AREAS "Synaptics Soft Button Areas"
+
+/* 32 bit, 4 values, left, right, top, buttom */
+#define SYNAPTICS_PROP_SECONDARY_SOFTBUTTON_AREAS "Synaptics Secondary Soft Button Areas"
 
 /* 32 Bit Integer, 2 values, horizontal hysteresis, vertical hysteresis */
 #define SYNAPTICS_PROP_NOISE_CANCELLATION "Synaptics Noise Cancellation"

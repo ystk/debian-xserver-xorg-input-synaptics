@@ -92,11 +92,6 @@ psaux	raw device access (Linux 2.4)
 psm	FreeBSD psm driver
 .TE
 .TP 7
-.BI "Option \*qSHMConfig\*q \*q" boolean \*q
-Switch on/off shared memory for run-time debugging. This option does not
-have an effect on run-time configuration anymore and is only useful for
-hardware event debugging.
-.TP 7
 .BI "Option \*qLeftEdge\*q \*q" integer \*q
 X coordinate for left edge. Property: "Synaptics Edges"
 .TP 7
@@ -116,13 +111,6 @@ release. Property: "Synaptics Finger"
 .BI "Option \*qFingerHigh\*q \*q" integer \*q
 When finger pressure goes above this value, the driver counts it as a
 touch. Property: "Synaptics Finger"
-.TP 7
-.BI "Option \*qFingerPress\*q \*q" integer \*q
-When finger pressure goes above this value, the driver counts it as a
-press.
-.
-Currently a press is equivalent to putting the touchpad in trackstick
-emulation mode. Property: "Synaptics Finger"
 .TP 7
 .BI "Option \*qMaxTapTime\*q \*q" integer \*q
 Maximum time (in milliseconds) for detecting a tap. Property: "Synaptics Tap
@@ -144,10 +132,6 @@ Durations"
 Whether the device is a click pad. See
 .B ClickPad support
 for more details. Property: "Synaptics ClickPad"
-.TP 7
-.BI "Option \*qFastTaps\*q \*q" boolean \*q
-Makes the driver react faster to a single tap, but also makes double
-clicks caused by double tapping slower. Property: "Synaptics Tap FastTap"
 .TP 7
 .BI "Option \*qVertEdgeScroll\*q \*q" boolean \*q
 Enable vertical scrolling when dragging along the right edge. Property:
@@ -176,26 +160,6 @@ Distance"
 .BI "Option \*qHorizScrollDelta\*q \*q" integer \*q
 Move distance of the finger for a scroll event. Property: "Synaptics Scrolling
 Distance"
-.TP 7
-.BI "Option \*qEdgeMotionMinZ\*q \*q" integer \*q
-Finger pressure at which minimum edge motion speed is set. Property:
-"Synaptics Edge Motion Pressure"
-.TP
-.BI "Option \*qEdgeMotionMaxZ\*q \*q" integer \*q
-Finger pressure at which maximum edge motion speed is set. Property:
-"Synaptics Edge Motion Pressure"
-.TP
-.BI "Option \*qEdgeMotionMinSpeed\*q \*q" integer \*q
-Slowest setting for edge motion speed. Property: "Synaptics Edge Motion Speed"
-.TP
-.BI "Option \*qEdgeMotionMaxSpeed\*q \*q" integer \*q
-Fastest setting for edge motion speed. Property: "Synaptics Edge Motion Speed"
-.TP
-.BI "Option \*qEdgeMotionUseAlways\*q \*q" boolean \*q
-If on, edge motion is also used for normal movements.
-.
-If off, edge motion is used only when dragging. Property: "Synaptics Edge
-Motion Always"
 .TP
 .BI "Option \*qMinSpeed\*q \*q" float \*q
 Minimum speed factor. Property: "Synaptics Move Speed"
@@ -206,9 +170,6 @@ Maximum speed factor. Property: "Synaptics Move Speed"
 .BI "Option \*qAccelFactor\*q \*q" float \*q
 Acceleration factor for normal pointer movements. Property: "Synaptics Move
 Speed"
-.TP
-.BI "Option \*qTrackstickSpeed\*q \*q" float \*q
-Speed scale when in trackstick emulation mode. Property: "Synaptics Move Speed"
 .TP
 .BI "Option \*qPressureMotionMinZ\*q \*q" integer \*q
 Finger pressure at which minimum pressure motion factor is applied. Property:
@@ -300,9 +261,14 @@ Valid values are:
 .TS
 l l.
 0	Touchpad is enabled
-1	Touchpad is switched off
+1	Touchpad is switched off (physical clicks still work)
 2	Only tapping and scrolling is switched off
 .TE
+When the touchpad is switched off, button events caused by a physical
+button press are still interpreted. On a ClickPad, this includes
+software-emulated middle and right buttons as defined by
+the SoftButtonAreas setting.
+.TP
 Property: "Synaptics Off"
 .TP
 .BI "Option \*qLockedDrags\*q \*q" boolean \*q
@@ -480,7 +446,7 @@ Property: "Synaptics Pad Resolution"
 .
 .TP
 .BI "Option \*qAreaLeftEdge\*q \*q" integer \*q
-Ignore movements, scrolling and tapping which take place left of this edge.
+Ignore movements, scrolling and tapping which start left of this edge.
 .
 The option is disabled by default and can be enabled by setting the
 AreaLeftEdge option to any integer value other than zero. If supported by the
@@ -489,7 +455,7 @@ the total width of the touchpad. Property: "Synaptics Area"
 .
 .TP
 .BI "Option \*qAreaRightEdge\*q \*q" integer \*q
-Ignore movements, scrolling and tapping which take place right of this edge.
+Ignore movements, scrolling and tapping which start right of this edge.
 .
 The option is disabled by default and can be enabled by setting the
 AreaRightEdge option to any integer value other than zero. If supported by the
@@ -498,7 +464,7 @@ the total width of the touchpad. Property: "Synaptics Area"
 .
 .TP
 .BI "Option \*qAreaTopEdge\*q \*q" integer \*q
-Ignore movements, scrolling and tapping which take place above this edge.
+Ignore movements, scrolling and tapping which start above this edge.
 .
 The option is disabled by default and can be enabled by setting the
 AreaTopEdge option to any integer value other than zero. If supported by the
@@ -507,7 +473,7 @@ the total height of the touchpad. Property: "Synaptics Area"
 .
 .TP
 .BI "Option \*qAreaBottomEdge\*q \*q" integer \*q
-Ignore movements, scrolling and tapping which take place below this edge.
+Ignore movements, scrolling and tapping which start below this edge.
 .
 The option is disabled by default and can be enabled by setting the
 AreaBottomEdge option to any integer value other than zero. If supported by the
@@ -522,9 +488,35 @@ The first four parameters are the left, right, top, bottom edge of the right
 button, respectively, the second four parameters are the left, right, top,
 bottom edge of the middle button, respectively. Any of the values may be
 given as percentage of the touchpad width or height, whichever applies.
-If any edge is set to 0, the button is assumed to extend to infinity in the
-given direction. Setting all values to 0 disables soft button areas.
+If any edge is set to 0 (not 0%), the button is assumed to extend to
+infinity in the given direction. Setting all values to 0 (not 0%) disables
+soft button areas. Button areas may not overlap, however it is permitted for two
+buttons to share an edge value.
 Property: "Synaptics Soft Button Areas"
+.
+.TP
+.BI "Option \*qHasSecondarySoftButtons\*q \*q" boolean \*q
+This option is only available on ClickPad devices.
+Enable the secondary software button area support. The exact area must be
+set in option \*qSecondarySoftButtonAreas\*q.  See
+.B ClickPad support
+for more details.
+.
+.TP
+.BI "Option \*qSecondarySoftButtonAreas\*q \*q" "RBL RBR RBT RBB MBL MBR MBT MBB" \*q
+This option is only available on ClickPad devices and only if
+.B Option \*qHasSecondarySoftButtons\*q
+is enabled.
+Define the secondary soft button click areas on ClickPad devices (usually on
+top of the device).
+For the allowed values for this option, see
+.B Option \*qSoftButtonAreas\*q.
+Primary and secondary soft button areas must not overlap each other. If they do,
+the behavior of the driver is undefined.
+Property: "Synaptics Secondary Soft Button Areas". This property is only
+initialized if 
+.B Option \*qHasSecondarySoftButtons\*q 
+is enabled and this option is set in the __xconfigfile__(__filemansuffix__).
 .
 
 .SH CONFIGURATION DETAILS
@@ -563,15 +555,16 @@ Coordinates to the left of LeftEdge are part of the left edge (areas
 1, 4 and 7), coordinates to the left of LeftEdge and above TopEdge
 (area 1) are part of the upper left corner, etc.
 .PP
-A good way to find appropriate edge parameters is to enable the
-SHMConfig option and run "synclient \-m 1" to see the x/y coordinates
-corresponding to different positions on the touchpad.
+A good way to find appropriate edge parameters is to use evtest(1) on the
+device to see the x/y coordinates corresponding to different positions on
+the touchpad.
 .PP
 The perceived physical edges may be adjusted with the AreaLeftEdge,
 AreaRightEdge, AreaTopEdge, and AreaBottomEdge options. If these values are
-set to something other than the physical edges, input in the space between
-the area edge and the respective physical edge is ignored. Note that this
-reduces the available space on the touchpad.
+set to something other than the physical edges, input that starts in the
+space between the area edge and the respective physical edge is ignored.
+Note that this reduces the available space on the touchpad to start motions
+in.
 .SS Tapping
 A tap event happens when the finger is touched and released in a time
 interval shorter than MaxTapTime, and the touch and release
@@ -622,9 +615,6 @@ effect on scrolling speed.
 Scrolling speed is determined solely from the VertScrollDelta and
 HorizScrollDelta parameters.
 .
-To disable vertical or horizontal scrolling, set VertScrollDelta or
-HorizScrollDelta to zero.
-.
 To invert the direction of vertical or horizontal scrolling, set
 VertScrollDelta or HorizScrollDelta to a negative value.
 .
@@ -652,33 +642,8 @@ If the pressure is below PressureMotionMinZ, PressureMotionMinFactor
 is used, and if the pressure is greater than PressureMotionMaxZ,
 PressureMotionMaxFactor is used.
 .
-By default, PressureMotionMinZ and PressureMotionMaxZ are equal to
-EdgeMotionMinZ and EdgeMotionMaxZ.
-.
 For a pressure value between PressureMotionMinZ and
 PressureMotionMaxZ, the factor is increased linearly.
-.
-.SS Edge motion
-When hitting an edge, movement can be automatically continued.
-.
-If EdgeMotionUseAlways is false, edge motion is only used when
-dragging.
-.
-With EdgeMotionUseAlways set to true, it is also used for normal
-cursor movements.
-.
-.LP
-Edge motion speed is calculated by taking into account the amount of
-pressure applied to the touchpad.
-.
-The sensitivity can be adjusted using the EdgeMotion parameters.
-.
-If the pressure is below EdgeMotionMinZ, EdgeMotionMinSpeed is used,
-and if the pressure is greater than EdgeMotionMaxZ, EdgeMotionMaxSpeed
-is used.
-.
-For a pressure value between EdgeMotionMinZ and EdgeMotionMaxZ, the
-speed is increased linearly.
 .
 .SS Middle button emulation
 Since most synaptics touchpad models don't have a button that
@@ -753,26 +718,6 @@ that it covers the incoming coordinate, and only the boxes own center is used
 as input. Obviously, the smaller the box the better, but the likelyhood of
 noise motion coming through also increases.
 
-.SS Trackstick mode
-Trackstick emulation mode is entered when pressing the finger hard on
-the touchpad.
-.
-The FingerPress parameter controls the minimum required finger
-pressure.
-.
-If the finger hasn't moved more than MaxTapMove after MaxTapTime has
-elapsed, trackstick mode is entered.
-.
-In this mode, moving the finger slightly in any direction gives a
-speed vector that moves the pointer.
-.
-The TrackstickSpeed parameter controls the ratio between pointer speed
-and finger movement distance.
-.
-Trackstick mode is exited when the finger pressure drops below
-FingerLow or when the finger is moved further than MaxTapMove away
-from the initial position.
-
 .SS ClickPad support
 A click pad device has button(s) integrated into the touchpad surface. The
 user must press downward on the touchpad in order to generated a button
@@ -788,15 +733,26 @@ support at runime, the user must also set the middle mouse button timeout to
 driver.
 .LP
 ClickPads provide software emulated buttons through 
-.B Option SoftButtonAreas.
+.B Option \*qSoftButtonAreas\*q.
 These buttons enable areas on the touchpad to perform as right or middle
 mouse button. When the user performs a click within a defined soft button
 area, a right or middle click is performed.
+.LP
+Some laptops, most notably the Lenovo T440, T540 and x240 series, provide a
+pointing stick without physical buttons. On those laptops, the top of the
+touchpad acts as software-emulated button area. This area can be enabled
+with
+.B Option \*qHasSecondarySoftButtons\*q
+and configured
+with
+.B Option \*qSecondarySoftButtonAreas\*q.
+On some platforms, this option
+will be set automatically if the kernel detects a matching device. On Linux,
+the device must have the INPUT_PROP_TOPBUTTONPAD property set.
 
 .SH "DEVICE PROPERTIES"
 Synaptics 1.0 and higher support input device properties if the driver is
-running on X server 1.6 or higher. On these driver versions, Option
-"SHMConfig" is not needed to enable run-time configuration. The synclient tool
+running on X server 1.6 or higher. The synclient tool
 shipped with synaptics version 1.1 uses input device properties by default.
 .
 Properties supported:
@@ -826,10 +782,6 @@ duration of a single click.
 8 bit (Bool).
 
 .TP 7
-.BI "Synaptics Tap FastTap"
-8 bit (BOOL).
-
-.TP 7
 .BI "Synaptics Middle Button Timeout"
 32 bit.
 
@@ -855,19 +807,7 @@ duration of a single click.
 
 .TP 7
 .BI "Synaptics Move Speed"
-FLOAT, 4 values, min, max, accel, trackstick.
-
-.TP 7
-.BI "Synaptics Edge Motion Pressure"
-32 bit, 2 values, min, max.
-
-.TP 7
-.BI "Synaptics Edge Motion Speed"
-32 bit, 2 values, min, max.
-
-.TP 7
-.BI "Synaptics Edge Motion Always"
-8 bit (BOOL).
+FLOAT, 4 values, min, max, accel, <deprecated>
 
 .TP 7
 .BI "Synaptics Button Scrolling"
@@ -1020,6 +960,25 @@ The following options are no longer part of the driver configuration:
 .BI "Option \*qSpecialScrollAreaRight\*q \*q" boolean \*q
 .TP
 .BI "Option \*qGuestMouseOff\*q \*q" boolean \*q
+.TP
+.BI "Option \*qSHMConfig\*q \*q" boolean \*q
+.TP
+.BI "Option \*qFingerPress\*q \*q" integer \*q
+.TP
+.BI "Option \*qTrackstickSpeed\*q \*q" float \*q
+.TP
+.BI "Option \*qFastTaps\*q \*q" boolean \*q
+.TP
+.BI "Option \*qEdgeMotionMinZ\*q \*q" integer \*q
+.TP
+.BI "Option \*qEdgeMotionMaxZ\*q \*q" integer \*q
+.TP
+.BI "Option \*qEdgeMotionMinSpeed\*q \*q" integer \*q
+.TP
+.BI "Option \*qEdgeMotionMaxSpeed\*q \*q" integer \*q
+.TP
+.BI "Option \*qEdgeMotionUseAlways\*q \*q" boolean \*q
+.TP
 
 .SH "AUTHORS"
 .LP

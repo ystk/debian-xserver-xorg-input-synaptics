@@ -1,20 +1,1268 @@
-commit d5ff9d8b0b186cf39695df84a10984eac559b746
+commit 3a4cc96590ca0e0ff526a5e5406f29a402bddd1a
 Author: Peter Hutterer <peter.hutterer@who-t.net>
-Date:   Tue Jun 12 13:46:34 2012 +1000
+Date:   Tue May 13 11:20:25 2014 +1000
 
-    synaptics 1.6.2
+    synaptics 1.8.0
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
 
-commit c1aae820601a911432c64938f03eab62bafaab2f
+commit d4d7229c41a20cf6757882a24f45e28d936a27c5
 Author: Peter Hutterer <peter.hutterer@who-t.net>
-Date:   Fri May 18 09:38:50 2012 +1000
+Date:   Wed Apr 30 13:08:53 2014 +1000
 
-    synaptics 1.6.1.901
+    conf: drop the PNPID matching from the fdi file
+    
+    Rely on INPUT_PROP_TOP_BUTTONPAD and default button areas as well.
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
 
-commit 7ccca8e7d8fbf2ccb5a2dbbfbf06ff4dbd6b7149
+commit a31ecb669f40d8db3ab1867eaedfe364bbd6fafe
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Apr 30 07:45:34 2014 +1000
+
+    synaptics 1.7.99.2
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit efa424b5c9c084c1c1136a68329709c7dc9ddfda
+Author: Clinton Sprain <clintonsprain@gmail.com>
+Date:   Tue Apr 29 19:47:17 2014 -0500
+
+    Fix product ID cutoff for MODEL_APPLETOUCH/MODEL_UNIBODY_MACBOOK
+    
+    Some Macbooks are being tagged as MODEL_UNIBODY_MACBOOKs when they should not
+    be. This causes the default sensitivity to be very low for them, making the
+    touchpad almost unusable. This change puts those devices into the correct
+    bucket again.
+    
+    Signed-off-by: Clinton Sprain <clintonsprain@gmail.com>
+    Reviewed-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 7bf27568417691e772e715f8fc6c30ea7ec892d6
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Tue Apr 22 18:58:11 2014 +0200
+
+    Add support for INPUT_PROP_TOPBUTTONPAD
+    
+    Add a HasSecondaryButtons boolean config option which defaults to true for
+    devices with the INPUT_PROP_TOPBUTTONPAD and false for all other devices.
+    
+    Only parse the SecondarySoftButtonAreas when this option is true, effectively
+    disabling the top buttons when it is false. Likewise, only initialize the
+    SecondarySoftButtonAreas property if we enable support for it.
+    
+    This means that it is now safe to always set a SecondarySoftButtonAreas
+    default in 50-synaptics.conf, and that he section which was intended for
+    use with future pnp-id matching can be dropped, as that is now all handled
+    in the kernel.
+    
+    While at also remove the comment about disabling the bottom edge area, as that
+    is now done automatically.
+    
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+
+commit 41afac2abf12dd74a171f726b57014f7fb266957
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Apr 29 12:13:10 2014 +1000
+
+    man: add some missing quotes
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit a6f0f4c9a5bcb0e25343dd4c59d4cc47cc5e8006
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Fri Apr 11 20:41:36 2014 +0200
+
+    Always count tripletap + click as 3 fingerclick on pads with < 3 touches
+    
+    When trying to do a 3 fingerclick on a touchpad which only tracks 2 touches,
+    this may register as a 3 or 2 fingerclick depending on the order in which
+    the touchpad detects the fingers. If the 2 outer fingers of the 3 get seen
+    first, then the 2 touches will be too far apart for the heuristic to see
+    them as being close together, and the click gets counted as a 2 finger click.
+    
+    A user will likely never do a 2 finger click with a 3th finger resting
+    somewhere else on the pad, where-as the above misdetection of the clicks is
+    a real issue, so simply always count a click with trippletap set as a
+    3 finger click on pads which track less then 3 touches.
+    
+    https://bugzilla.redhat.com/show_bug.cgi?id=1086218
+    
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Reviewed-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit f183c1c38778b659b4c75a0e2c532dd5a9f8d437
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Apr 9 10:41:29 2014 +1000
+
+    conf: add more PnPIDs and DMI matches for Lenovos
+    
+    And expand DMI strings to more precise matches
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+
+commit 62ef210d11714703345dc8d35915ff53c37aee01
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Apr 7 16:16:13 2014 +1000
+
+    Comment the touch states
+    
+    Everytime I look at this I get confused about OPEN_EMPTY vs EMPTY. Let's fix
+    that.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+
+commit bfceb1bc580656aceb14e4b0f880bfcb3e4bc368
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Apr 4 15:51:22 2014 +1000
+
+    eventcomm: Hook up the libevdev log handler
+    
+    This is a bit problematic: libevdev only has one global log handler.
+    So if we have another driver use libevdev, we'll either overwrite that handler
+    or get overwritten, whichever comes first. So we need to re-set the handler
+    every time we get an event to make sure we log through our handler.
+    Likewise, if we ever drop the device, we need to unset the log handler back to
+    NULL because we may unload the module and our handler may disappear.
+    
+    Use the lowest logging priority, let the server filter based on the verbosity
+    level instead.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+
+commit 6ad856790630393bbd41b0bd7746ed9b0629a7c6
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Apr 3 16:41:15 2014 +1000
+
+    eventcomm: read one more event after finishing a sync
+    
+    Once the sync finishes, we get -EAGAIN. This only indicates the sync is done,
+    but some events may still be waiting in the pipe for us to read. We must read
+    those now, otherwise select may not trigger on further data.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+
+commit bec41416dbbee73eef9eee122d0acacc148e329d
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Apr 3 15:42:45 2014 +1000
+
+    eventcomm: drop superflous helper function
+    
+    last_mt_vals_slot is only used in one location and there we can just use
+    cur_slot
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+
+commit f1948e08ee9894864254a18098e4f4fceb6e322f
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Mar 19 15:08:15 2014 +1000
+
+    Disable GrabEventDevice by default
+    
+    This was required when we started supporting hotplugging to avoid duplicate
+    events. These days the drawback of not being able to record events in the case
+    of a bug is significant.
+    
+    Check the configuration source on init. If the device was hotplugged through a
+    a server config backend, disable the grab. If the device was statically
+    configured through an xorg.conf then leave the default grab enabled to avoid
+    a duplicate device.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+
+commit fd709900445e3cb9f31ce7e780bfa98ecb6dab9b
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Mar 18 07:28:44 2014 +1000
+
+    synaptics 1.7.99.1
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit dc5474964d4ec73b5c324961026e1037bb344946
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Mar 17 14:55:37 2014 +1000
+
+    If the touchpad is in TOUCHPAD_OFF mode, allow physical clicks
+    
+    Enabling clicks in off mode also allows for the new Lenovo *40 series to use
+    the top software buttons while the touchpad is disabled. This benefits those
+    that usually disable touchpads altogether but still need the buttons for the
+    trackstick.
+    
+    This changes existing behaviour, but TouchpadOff was always intended to stop
+    erroneous events while typing. Physical button presses are hard to trigger
+    accidentally. On the touchpads that TouchpadOff concept was originally
+    designed for the buttons are nowhere near the keyboard and are physically
+    separated from the touchpad anyway. On Clickpads, triggering a physical
+    click requires more force than accidentally touching the surface.
+    
+    https://bugs.freedesktop.org/show_bug.cgi?id=76156
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+
+commit 4122db68f61c695eae3a65aec18db08b29898b6a
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Mar 13 08:26:08 2014 +1000
+
+    conf: automatically enable the top softbutton area for the new Lenovos
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 18dae625eada20c4486542f9bb037fa2782d75bd
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Sun Aug 5 14:32:08 2012 +1000
+
+    conf: apply ClickPad softbuttons option through fdi file too (fixed version)
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit f2cb48e6eee47fa621edaaf2f75b495b12f6eb55
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Mar 13 10:14:40 2014 +1000
+
+    Revert "conf: apply ClickPad softbuttons option through fdi file too"
+    
+    Bad fdi file, type="string" is missing and it wouldn't merge properly.
+    
+    This reverts commit a35b2d629d85d7a8c82621a5098a17e5ffb341dc.
+
+commit a35b2d629d85d7a8c82621a5098a17e5ffb341dc
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Sun Aug 5 14:32:08 2012 +1000
+
+    conf: apply ClickPad softbuttons option through fdi file too
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 17bbcad28000bbd896a33047c0720ada89e05f5d
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Mar 12 14:11:29 2014 +1000
+
+    Revert "Add another third state to TouchpadOff for disabling all but button clicks"
+    
+    This third state is not needed, the behaviour of the touchpad driver is now
+    good enough to not need an external syndaemon instance to toggle this third
+    state.
+    
+    This reverts commit eea73358760c7ff9c9dac061f265753637c6f25c.
+    
+    Conflicts:
+    	man/synaptics.man
+    	src/synaptics.c
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit b40a5255fe73f7f95c8ff7145dd91605f3430119
+Author: Stephen Chandler Paul <thatslyude@gmail.com>
+Date:   Mon Mar 10 18:33:20 2014 -0400
+
+    Don't allow any type of movement starting in the top softbutton area
+    
+    Clicking in the top soft button area causes the trackpad to begin
+    registering motion, even if the finger never leaves the top soft button
+    area. We don't want this kind of behavior for the top soft button area,
+    since it makes clicking and dragging items much more difficult when
+    using a pointing stick.
+    
+    Signed-off-by: Stephen Chandler Paul <thatslyude@gmail.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 9a419ba01c53a38b4b601f4415801fca29a2b4e2
+Author: Stephen Chandler Paul <thatslyude@gmail.com>
+Date:   Mon Mar 10 18:25:20 2014 -0400
+
+    Replace is_inside_anybutton_area with current_button_area
+    
+    Signed-off-by: Stephen Chandler Paul <thatslyude@gmail.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 2e5c0cf4395a0cf7b024495deab75f4ebe949e9a
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Mar 10 16:43:54 2014 +1000
+
+    eventcomm: drop mtdev
+    
+    All kernel touchpad devices now support slots, there isn't really a need to
+    support protocol A devices in synaptics. If such devices exist, we just treat
+    them as non-multitouch devices.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+    Reviewed-by: Benjamin Tissoires <benjamin.tissoires@gmail.com>
+
+commit c90a76ab0e752be0be4d9d835289df05d783f979
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Mar 10 16:35:45 2014 +1000
+
+    eventcomm: drop some use of mtdev
+    
+    When checking the device don't open a new mtdev instance, use the existing
+    libevdev struct.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+    Reviewed-by: Benjamin Tissoires <benjamin.tissoires@gmail.com>
+
+commit 5b7e1726369d4973859996f225bec743c2e21288
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Mar 10 16:42:34 2014 +1000
+
+    eventcomm: drop calculation of slot offset
+    
+    The kernel guarantees slots start at 0
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+    Reviewed-by: Benjamin Tissoires <benjamin.tissoires@gmail.com>
+
+commit 040dfeba6886b8e910fb6b347c283e60fe24a147
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Mar 11 14:50:01 2014 +1000
+
+    eventcomm: fix wrong event code for SYN_REPORT
+    
+    This was supposed to emulate a SYN_REPORT event so that the upper layers
+    process what's in the queue.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+    Reviewed-by: Benjamin Tissoires <benjamin.tissoires@gmail.com>
+
+commit 66240dc329683f0141c1e11590ea2c3d8ca25788
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Mar 10 09:07:59 2014 +1000
+
+    Add property support for secondary (top) software buttons
+    
+    This was originally intended as a fixed xorg.conf option only (and still
+    largely is seen as such). Secondary software button are required only on a specific series
+    of touchpads and should be pre-configured by the system and/or the
+    distribution. As such, the property will not be initialized if it is not set
+    in the xorg.conf and will thus not respond to runtime changes.
+    
+    Exposing the property in this way gives clients a chance of detecting if a top
+    software button area is present and thus adjust their behaviour accordingly.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+
+commit 80efc2f54f11a4d45411951f7055bfec2ed40fee
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Sat Mar 8 10:41:14 2014 +0100
+
+    synaptics: Add support for server managed fds
+    
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit c431d900f54696f608312ea51b1fa671839f7d42
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Feb 26 15:30:55 2014 +1000
+
+    man: fix documentation about the new touchpad state
+    
+    leftover from an earlier revision
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit bbe4c56c4998a90b478581a4d93717251d8e05be
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Fri Feb 21 10:31:44 2014 +0100
+
+    Wait for *new* coordinates on a clickpad click before reporting the click
+    
+    It is possible for a click to get reported before any related touch events
+    get reported, here is the relevant part of an evemu-record session on a T440s:
+    
+    E: 3.985585 0000 0000 0000	# ------------ SYN_REPORT (0) ----------
+    E: 3.997419 0003 0039 -001	# EV_ABS / ABS_MT_TRACKING_ID   -1
+    E: 3.997419 0001 014a 0000	# EV_KEY / BTN_TOUCH            0
+    E: 3.997419 0003 0018 0000	# EV_ABS / ABS_PRESSURE         0
+    E: 3.997419 0001 0145 0000	# EV_KEY / BTN_TOOL_FINGER      0
+    E: 3.997419 0000 0000 0000	# ------------ SYN_REPORT (0) ----------
+    E: 5.117881 0001 0110 0001	# EV_KEY / BTN_LEFT             1
+    E: 5.117881 0000 0000 0000	# ------------ SYN_REPORT (0) ----------
+    E: 5.133422 0003 0039 0187	# EV_ABS / ABS_MT_TRACKING_ID   187
+    E: 5.133422 0003 0035 3098	# EV_ABS / ABS_MT_POSITION_X    3098
+    E: 5.133422 0003 0036 3282	# EV_ABS / ABS_MT_POSITION_Y    3282
+    E: 5.133422 0003 003a 0046	# EV_ABS / ABS_MT_PRESSURE      46
+    E: 5.133422 0001 014a 0001	# EV_KEY / BTN_TOUCH            1
+    E: 5.133422 0003 0000 3102	# EV_ABS / ABS_X                3102
+    E: 5.133422 0003 0001 3282	# EV_ABS / ABS_Y                3282
+    E: 5.133422 0003 0018 0046	# EV_ABS / ABS_PRESSURE         46
+    E: 5.133422 0001 0145 0001	# EV_KEY / BTN_TOOL_FINGER      1
+    E: 5.133422 0000 0000 0000	# ------------ SYN_REPORT (0) ----------
+    
+    Notice the BTN_LEFT event all by itself!
+    
+    If this happens, it may lead to the following problem scenario:
+    -touch the touchpad in its right click area
+    -let go of the touchpad
+    -rapidly click in the middle area, so that BTN_LEFT gets reported before the
+     new coordinates (such as seen in the trace above, this may require some
+     practicing with evemu-record to reproduce)
+    -the driver registers the click as a right click because it uses the
+     old coordinates from the cumulative coordinates to determine the
+     click location
+    
+    This commit fixes this by:
+    1) Resetting the cumulative coordinates not only when no button is pressed,
+       but also when there is no finger touching the touchpad, so that when
+       we do get a touch the cumulative coordinates start at the right place
+    2) Delaying processing the BTN_LEFT down transition if there is no finger
+       touching the touchpad
+    
+    This approach has one downside, if we wrongly identify a touchpad as
+    a clickpad, then the left button won't work unless the user touches the
+    touchpad while clicking the left button.
+    
+    If we want we can fix this by doing something like this:
+    1) Making update_hw_button_state return a delay; and
+    2) Tracking that we've delayed BTN_LEFT down transition processing; and
+    3) When we've delayed BTN_LEFT down transition return a small delay value; and
+    4) If when we're called again we still don't have a finger down, just
+       treat the click as a BTN_LEFT
+    
+    But this is not worth the trouble IMHO, the proper thing to do in this
+    scenario is to fix the mis-identification of the touchpad as a clickpad.
+    
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 743c45b9cfd057d00c37dab1cfca4b6202fb2642
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Fri Feb 21 10:31:43 2014 +0100
+
+    On button down update cumulative to current x and y, instead of previous
+    
+    When a button click and new coordinates get reported in one go we sync the
+    cumulative coordinates to the old x and y, rather then the newly reported ones.
+    
+    This keeping of the old coordinates causes the following issue:
+    -touch the touchpad in its right click area
+    -let go of the touchpad
+    -rapidly click in the left click area (or middle area), so that the
+     new location and the click get reported in one syn (may require some
+     practicing with evemu-record to reproduce)
+    -the driver registers the click as a right click because it uses the
+     old coordinates from the cumulative coordinates to determine the
+     click location
+    
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 71652fe1f0800b081ba5602e9edda22a8d8d628e
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Fri Feb 21 10:31:42 2014 +0100
+
+    Ignore motion the first X ms after a clickpad click
+    
+    This fixes my #1 anoyance with clickpads, where 2 out of 3 clicks turn into
+    a click + drag unless I hold my finger really really still.
+    
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    
+    Replaced property with a hardcoded 100ms. This is not something that we should
+    expose as property, we should find a delay that works best and live with it.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 3adaf4623845dce54129b6474f4f8f2966f9bc47
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Fri Feb 21 10:31:41 2014 +0100
+
+    Don't report motion inside soft-button areas
+    
+    Unless the motion has started outside the soft-button area.
+    
+    Note that we must start reporting motions regardless of whether we think we're
+    in the button area or not as soon as we've switched to using cumulative
+    coordinates, since then the coordinates are no longer absolute.
+    
+    This fixes the reporting of unintended motion just before a click in a soft
+    button area which sometimes causes mis-clicks.
+    
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit effeee86c1c286cd09ab750efc4932790dd560dd
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Fri Feb 21 10:31:40 2014 +0100
+
+    Get rid of old_hw_state
+    
+    We only use it to store button state which we already have in
+    priv->lastButtons.
+    
+    While at it also properly indent the code block checking the various
+    soft button areas.
+    
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 840670508e0150ae11ae744c676253c7fba332dc
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Fri Feb 21 10:31:39 2014 +0100
+
+    Add an enum for the different soft_button_areas
+    
+    While at it also move the enum for the soft button edges out of
+    is_inside_button_area() so that it can be used elsewhere too.
+    
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit eea73358760c7ff9c9dac061f265753637c6f25c
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Feb 21 10:31:37 2014 +0100
+
+    Add another third state to TouchpadOff for disabling all but button clicks
+    
+    On a new set of laptops like the Lenovo T440 the trackstick does not have
+    physical buttons. Instead, the touchpad's top edge is supposed to acts
+    software button area. To avoid spurious cursor jumps when the trackstick is in
+    use and the finger is resting on the touchpad, add another mode that disables
+    motion events.
+    
+    Enabled by syndaemon with -t click-only, the default stays unchanged. No
+    specific integration with the traditional disable-while-typing is needed. On
+    such touchpads, disabling motion events is sufficient to avoid spurious
+    events and we don't want to stop HW buttons to send events.
+    
+    Note that this only adds the new state to the driver and to syndaemon, there
+    is nothing hooked up otherwise to actually monitor the trackstick.
+    
+    Special note for syndaemon: optional arguments are a GNU extension, so work
+    around it by messing with an optstring starting with ":" which allows us to
+    manually parse the options.
+    
+    Original version of this patch by John Pham <jhnphm@gmail.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit ac78616d074f2d248543411c106f0d1befeef58d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 22 01:44:38 2014 -0800
+
+    When re-opening evdev, set the fd before trying to grab
+    
+    If we try to grab the evdev device before we've set the new file
+    descriptor, libevdev_grab returns -EFAULT, which causes DeviceOn to
+    fail.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 22fe8bdc6668e78853768c62f4d1331114c7eca0
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Feb 22 01:44:37 2014 -0800
+
+    Close device if DeviceOnHook fails
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 402cc872570b58b8420e7973d0706f3b2a2aaf91
+Author: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+Date:   Thu Feb 20 13:13:18 2014 -0500
+
+    Add secondary (top) software buttons area
+    
+    New generation of laptops with trackstick do not have physical buttons
+    associated with the trackstick, but instead rely on software buttons at
+    the top of the clickpad.
+    Adding a secondary software button area for this purpose.
+    As we're likely detecting the devices that need it based on udev tags
+    and MatchTag configuration items, this area doesn't need to be exposed
+    through properties. So static configuration is fine.
+    
+    Signed-off-by: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+    Reviewed-by: Peter Hutterer <peter.hutterer@who-t.net>
+    
+    [couple of man-page additions and rewrites]
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 945acfc261707be78cbc5438c22b061e20076004
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Wed Feb 19 18:30:35 2014 +0100
+
+    Allow using the entire touchpad for motions started inside the active area
+    
+    synaptics offers an option to make parts of the touchpad insensitive. This
+    is ie useful to do palm avoidance rather then palm detection (which may be
+    unreliable) by disabling an area of 15% on the right and left side of the
+    touchpad.
+    
+    Currently a motion which has started inside the active area, stops as soon
+    as it moves outside of the active area.
+    
+    If a motion started inside the active area and thus has already generated some
+    move events, this makes no sense. If the user moves outside of the active
+    area in this case, this is very likely because the user wants to continue
+    the motion.
+    
+    This commit allows such motions to continue normally.
+    
+    I would like to thank Juerd Waalboer for the basic idea, some coding and lots
+    of testing for this fix.
+    
+    Cc: Juerd Waalboer <juerd@tnx.nl>
+    Reported-by: Juerd Waalboer <juerd@tnx.nl>
+    Tested-by: Juerd Waalboer <juerd@tnx.nl>
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Reviewed-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 2ea76fad6545a712713de1a09965158805e83c55
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Feb 18 10:14:37 2014 +1000
+
+    man: setting scroll deltas to 0 doesn't work (#75074)
+    
+    6d47d33 disallows a zero value for horizontal/vertical scroll deltas but the
+    man page wasn't updated. We've added separate toggles to enable/disable
+    scrolling a few years ago, setting the distance to 0 is not recommended.
+    
+    X.Org Bug 75074 <http://bugs.freedesktop.org/show_bug.cgi?id=75074>
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 4f543ce1d6ae9ca11086a3009d149505590584a8
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Feb 13 14:55:12 2014 +1000
+
+    Revert "Drop circular pad support"
+    
+    This reverts commit 3b02e7fd81da4b100fb9ac32378f6d50f54cf0e2.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    
+    Conflicts:
+    	man/synaptics.man
+    	src/synaptics.c
+    
+    Acked-by: Daniel Stone <daniel@fooishbar.org>
+
+commit 5d8cdaf4b1552c12fe6626059b9af4a6da6491e9
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Feb 10 08:57:19 2014 +1000
+
+    Drop the half-baked test suite
+    
+    This suite was never really maintained anyway, and it is quite hard to do so
+    anyway. The driver is linked to the server's API too tightly to easily do
+    independent testing. We need to re-implement stubs for the API the driver
+    uses, have to track API changes, etc. Not worth the effort.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit e0069c154440305ece6def92a9813a9f8004b2fb
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Jan 17 08:24:35 2014 +1000
+
+    Revert "Purge scrollbuttons (repeat)"
+    
+    This reverts commit 0903d99ada1755f11a2a5cbf89a345de896e18ec.
+    
+    Scroll buttons are still present in some modern devices, e.g. the Fujitsu
+    Lifebook E782 and others in the series.
+    
+    Conflicts:
+    	include/synaptics.h
+    	man/synaptics.man
+    	src/synaptics.c
+
+commit 48fbf44a3903bc6975add21be35586914a53c310
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Jan 17 08:18:03 2014 +1000
+
+    Bump to 1.7.99
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 51b6bf3c1083638527b18696c2b682fd78c97070
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Dec 16 09:43:40 2013 +1000
+
+    On clickpads with two touchpoints, try to detect clickfinger 3 actions
+    
+    Some touchpads provide BTN_TOOL_TRIPLETAP but do not track more than two
+    touchpoints. For those, try to detect clickfinger3 actions as best as we can.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    (cherry picked from commit 9388b54a109bbd634e05611e6c90110d698f13d1)
+
+commit 49fe70e99d1b0932ab915824c78f952a0fdb3ee7
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Jan 3 11:23:22 2014 +1000
+
+    Fix ABI detection for in-driver scaling
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 29318c1d94510cfb6d5d712e912af111f99edb42
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Dec 5 09:31:11 2013 +1000
+
+    Add missing property handler for the pressure motion factor
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 5d391e352f4e502ada6444a7ce860683e3480fbf
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Dec 4 07:58:26 2013 +1000
+
+    eventcomm: ungrab the device on DeviceOff
+    
+    For symmetry, the kernel should ungrab when we close the fd.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 3b9267e5a67a153675174818114e390e17c61f2d
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Nov 6 10:52:55 2013 +1000
+
+    Drop edge speed from get_delta
+    
+    Always 0 anyway, and the feature was purged in
+    xf86-input-synaptics-1.6.0-8-g54f65f3
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 0fc2679c4d148f9753e1964d7df8b00dc94401f6
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Nov 4 15:23:39 2013 +1000
+
+    autogen.sh: support NOCONFIGURE=1
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 03b4faeadfb50b26452dd2f494540b0f5a8b7399
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Nov 4 15:22:31 2013 +1000
+
+    Drop maintainer mode
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 41840a656f5c790b49fe798b9d99136c23e09a5f
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed May 29 15:07:44 2013 +1000
+
+    Switch to libevdev for the eventcomm backend
+    
+    This has a potential bug that would need to be fixed in mtdev first:
+    if we get a SYN_DROPPED and we miss out on events, the current code emulates a
+    normal EV_SYN, feeds that to mtdev and hopes that that fills the mtdev output
+    queue.
+    
+    If mtdev doesn't generate events on that EV_SYN, we're stuck in limbo and may
+    get weird results. The loop will continue and sync the device, but there's the
+    off chance we get odd events.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 0fb59b3487d57523a03f078a2061e2ea0cacbc7c
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Jul 19 11:08:43 2013 +1000
+
+    Disable driver scaling for input ABI 19.2
+    
+    For absolute devices in relative mode, i.e. touchpads, the server now takes
+    device resolution into account. Doing so means that the driver mustn't
+    scale, so we deactivate those bits in the driver.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 96cf04dce19e7c90bc05b8b3b192b5bfb97381d2
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon May 13 10:03:48 2013 +1000
+
+    synaptics 1.7.1
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 3bd40423b26ab692174ddcdd12489467ba876926
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu May 9 11:09:51 2013 +1000
+
+    Plug memory leak for priv->touch_axes
+    
+    Allocated in event_query_touch, was never freed.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Dave Airlie <airlied@redhat.com>
+
+commit eb50f8023e9ce11c3f0249ef9ddf398a1d983c84
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu May 9 11:06:12 2013 +1000
+
+    Plug memory leak for option_string
+    
+    xf86SetStrOption() returns a strdup'd string that must be freed after use.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Dave Airlie <airlied@redhat.com>
+
+commit 7cc0ebf0858ebb505d933839f25bb269a8cdb764
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Apr 26 10:09:10 2013 +1000
+
+    Fix stack smash in clickpad_guess_clickfingers()
+    
+    Apple Magic Trackpad can report 16 slots. In clickpad_guess_clickfingers()
+    the array allocated on the stack contains only 10 slots.
+    As (.num_mt_mask == .num_slots), the function writes out of the bounds
+    of close_point.
+    
+    Use a size 32 bitmask instead and warn if we ever get past 32 touchpoints.
+    
+    This fixes:
+    https://bugzilla.redhat.com/show_bug.cgi?id=952221
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reported-by: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+
+commit ac47b4ea5b4f7b920b84a1e70adce3475e3be346
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Apr 3 10:50:50 2013 +1000
+
+    Allow soft button areas to overlap on the edge
+    
+    For percent-based configuration in the form of
+    middle button 33%-66%, right button 66%-0 we'd get an error because of the
+    one device unit overlap. This was neither documented nor useful, because
+    leaving a 1% gap leaves an actual gap between the buttons. Allow for an
+    overlap of one device unit on the edge of the buttons.
+    
+    What's picked in that case depends on the implementation of
+    is_inside_softbutton_area but since one device unit is so small, it doesn't
+    matter.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 368d96f4dfd4605b80d039ec4508c906c3723cf7
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Apr 3 10:50:21 2013 +1000
+
+    man: clarify that 0, not 0% disables the softbutton area
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 148afc2dd55bb5d256d8b251542c90bcca7aaf84
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Apr 3 10:34:28 2013 +1000
+
+    Improve readability of the soft button areas
+    
+    Replace the hardcoded indices with enums that are somewhat expressive.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 691e8db4d8a5e35eb31f62d1e54523917e2830cd
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Apr 2 13:12:09 2013 +1000
+
+    synaptics 1.7.0
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 43e98fe4909dbb1b82b486f2831a38d9db0c8957
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Mar 26 15:26:42 2013 +1000
+
+    synclient: use a parameter that actually exists in the man page example
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 5b49e4ad6cead80679405933603ff99ac00089b7
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Mar 26 15:24:56 2013 +1000
+
+    synclient: drop XF86Config-4 from man page
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 109ce14ae11f6a6afb66ddc683c7071ebbf9d352
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Mar 26 15:21:54 2013 +1000
+
+    syndaemon: list -? in help/man page
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit eb5f086f29ed5e45cbbaad73a04a7275ab119d03
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Mar 26 15:18:03 2013 +1000
+
+    synclient: support -? for usage
+    
+    man page and help claim we support this, so let's do so
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit d0590052873d6ce7c28e6e99b6aad33cf6dff944
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Mar 26 15:13:06 2013 +1000
+
+    synclient: remove 'm' and 'h' from getopt and man page
+    
+    Removed as of 83d88b253139f9c92d619e7ad7c3981138893536
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit d771cf75b101a741e29ba0765050936f52f1bca2
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue Mar 26 15:12:29 2013 +1000
+
+    tools: drop -s listing in synclient's help output. SHM is gone.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 43575f387865007e7ab3ed45088add62b674318d
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Mar 25 16:49:05 2013 +1000
+
+    eventcomm: print axis resolution to the log
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 4cdee40054b2d6e222a7efb427f0f35479c04ec3
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Jan 31 09:27:19 2013 +1000
+
+    Replace numerical values with an enum for the TouchpadOff prop
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 2159b5d26207c83efea6efca7fa5765df95a4219
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Jan 4 16:08:47 2013 +1000
+
+    conf: add example for AreaBottomEdge on clickpad buttons
+    
+    Those that use clickpad buttons as buttons can see cursor jumps as the press
+    on the touchpad - largely caused by the finger changing shape as the
+    pressure changes and thus moving the hotspot.
+    
+    Simple fix is to define the clickpad soft button areas as dead areas, but
+    this cannot be set as general option as it would break for those that use
+    tapping.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit ce7565ea6683f594f1f2ab5769bf60b1337d70bd
+Author: Daniel Stone <daniel@fooishbar.org>
+Date:   Sat Dec 29 03:24:52 2012 +0000
+
+    Free mtdev device as well as closing it
+    
+    mtdev_close_delete() is to mtdev_new_open() as mtdev_close() is to
+    mtdev_open().  So, since we're using mtdev_new_open(), we need to use
+    mtdev_close_delete() instead of just mtdev_close() to actually free
+    everything.
+    
+    Fixes an eventual failure to open the touchpad device after a lot of
+    suspend/resume cycles.
+    
+    [whot: amended to mtdev_close_delete in evdev_query_touch]
+    
+    Signed-off-by: Daniel Stone <daniel@fooishbar.org>
+    Reviewed-by: Dan Nicholson <dbn.lists@gmail.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit a5ac54f60af96b9b862425ccd8b6c7afaa4937e4
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Dec 21 10:37:34 2012 +1000
+
+    Allow dead areas to update the button state
+    
+    On clickpads, a dead area helps prevent pointer movement when the buttons
+    are pressed. Thus check for the button state before resetting the hw state
+    in case we get a right-click in the soft button area.
+    
+    For clickfinger, the effect is that clickfinger events are now triggered if
+    the finger rests in the dead area.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 86460318ba5606ef41712b52e50bf7b2ba083226
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Aug 23 16:22:31 2012 +1000
+
+    Recognise the soft button area property before clickpad is enabled
+    
+    Otherwise the driver has no internal reference to the soft button area
+    property and will ignore any setting.
+    
+    Also, if a client sets this property, we claim it as our own and disallow
+    deletion.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 3cb14dcccf5574366d90e24f351e3ad04b35e35f
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon Oct 8 11:10:44 2012 +1000
+
+    test: drop xf86CheckStrOption from fake symbols
+    
+    The tests don't need this symbol anymore.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 89cffd403b798a96d36b8d47a202f30ef1023e63
+Author: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date:   Sat Sep 15 23:52:13 2012 +0200
+
+    Enable ps2comm and alpscomm build on GNU/Hurd
+    
+    Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+
+commit a245d42f53096b1ae81e6702729f97ca508e5b5b
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu Aug 30 16:38:38 2012 +1000
+
+    Reset num_active_touches on DeviceOff (#52496)
+    
+    When disabling the device, reset num_active_touches to zero. Otherwise,
+    num_active_touches stays at the value it was on DeviceOff(). Future touches
+    add to that value until the index may go past priv->open_slots[].
+    That causes spurious memory corruption on touch ends.
+    
+    And as of 55fc42e7c9b4948cadd4f98ef7b6a3b12e268e3e we ignore pre-existing
+    touches anyway.
+    
+    Test-case:
+    - place num_touches fingers on the touchpad
+    - xinput disable <device>
+    - lift fingers
+    - xinput enable <device>
+    - place finger on device, num_active_touches is now (num_touches + 1)
+    
+    X.Org Bug 52496 <http://bugs.freedesktop.org/show_bug.cgi?id=52496>
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit e28575b29b394b38f1d92b75353fc0fe82838b7c
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri May 25 14:20:39 2012 +1000
+
+    Use LogMessageVerbSigSafe on ABI 18
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 001097476a67057124536b753bbbef047961bab5
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed Aug 1 13:33:41 2012 +1000
+
+    Decorate the accel log messages with (accel)
+    
+    The MinSpeed message already does so, do it for MaxSpeed and AccelFactor
+    too.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 01456336976213cec724533e13c41f1908491e58
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Jun 22 15:59:32 2012 +1000
+
+    eventcomm: proto_data is not null, don't check
+    
+    We allocate it just a few lines north of here, and already dereferenced it.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 33c5bfc702645e603312aeb5380c53afeaad1dce
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Jun 22 15:55:23 2012 +1000
+
+    eventcomm: simplify conditions
+    
+    As of 3f9794a8a0f019a4b153941c9ec1927c7797ce6f, slot_index is always >= 0
+    when we get to either of these conditions.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 0e222876d7da7acbaaf955c2e7b7efdf3549bde9
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Fri Jun 8 13:53:38 2012 -0700
+
+    Turn down the default sensitivity for unibody MacBook touchpads
+    
+    The touchpads are too sensitive by default. A touch is activated when a
+    finger hovers a millimeter off the device. This change turns down the
+    default sensitivity so that accidental touchpad interactions are
+    lessened and pointer interaction accuracy is increased.
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+    Reviewed-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 4fa880d2b1e1805e90827af5bbb483e268ac68a3
+Author: Chase Douglas <chase.douglas@canonical.com>
+Date:   Fri Jun 8 13:53:37 2012 -0700
+
+    Add MODEL_UNIBODY_MACBOOK touchpad model for bcm5974 devices
+    
+    Initially, treat them the same as MODEL_APPLETOUCH devices, as that is
+    what they were recognized as before.
+    
+    Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 43c9be99c1fd35c2974e0db41cad9f7b875fb6c9
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri May 18 14:32:31 2012 +1000
+
+    Remove leftover HAVE_SMOOTH_SCROLL typedef
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 51f99d0adcb6ffab6eb5b2220d02b6b66a978983
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu May 17 17:38:20 2012 +1000
+
+    Move properties header to where it's needed
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit d45394559a89bee49758ea7d42d00c471727f4f5
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu May 17 16:32:32 2012 +1000
+
+    ps2comm: use ErrorF from PS2DBG directly
+    
+    And switch a few current DBG messages to PS2DBG to have one ps/2 debugging
+    output command.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 7decf4666fcc7a0a1c3a070abec876439dc8f376
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon May 21 10:54:19 2012 +1000
+
+    Fix indentation for the synaptics protocol ops
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit f3abb163c3c216f48a5f4624b12c32e496336513
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon May 21 10:35:47 2012 +1000
+
+    check for HAVE_CONFIG_H before including config.h
+    
+    No real effect, just for correctness. Plus, move the include directive up to
+    be the first include.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit e6ca6521b4e880c6a314a880e73039e574a02c28
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed May 23 14:22:32 2012 +1000
+
+    Un-typedef model_lookup_t
+    
+    Long-term, structs will be structs without typedef. This one is the easiest
+    one to convert, the rest follows later.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 9ae890cf4e5df184f68799d534fa6aa67c36301b
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed May 23 14:23:00 2012 +1000
+
+    tools: un-typedef TouchpadState
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 0d9996da02493bed8931663bb3d724e30bd56877
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Wed May 23 13:51:14 2012 +1000
+
+    Remove typedefs from all enums
+    
+    We currently mix non-typedef'd and typedef'd enums in the code. Stop this
+    mixing, remove typedefs to make the code more obvious.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 29bc1a8a5e0d12dadaed3f9d162bcc6b7913250a
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon May 21 16:01:42 2012 +1000
+
+    Remove an unused define for 1/sqrt(2)
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 3621ef8a2b02da5ef303b80e26ec46b4a89cb9da
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Mon May 21 14:05:01 2012 +1000
+
+    DeviceOn and friends return a status code, not a bool
+    
+    No functional changes, just making things more obvious.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 1770c8a7e82099753c4eb743868cde8c4228d531
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri May 18 16:08:08 2012 +1000
+
+    Remove @DRIVER_NAME@ from Makefile.am
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 64faedf49fe952e48a07434381fbf826a1cbed41
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri May 18 16:31:55 2012 +1000
+
+    Fix indentation mishap
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit a9d247d076b3d0d1df84f013b3733bd6297dd79b
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu May 17 15:52:50 2012 +1000
+
+    Remove absolute mode
+    
+    Moving a touchpad in absolute mode is unusual - touchpads are disconnected
+    from the output device, so direct interaction is hard. There appears to be
+    little usage of it (I haven't seen bug reports from people claiming to use
+    it). Joe Shaw, author of the code and only known user doesn't have a use for
+    it anymore, so purge it from the repo.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 6d47d334d8a876e7e094306c313246b87016b78a
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Thu May 17 12:10:04 2012 +1000
 
@@ -27,9 +1275,8 @@ Date:   Thu May 17 12:10:04 2012 +1000
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
     Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
-    (cherry picked from commit 6d47d334d8a876e7e094306c313246b87016b78a)
 
-commit f8d970e191e6df05a8f2c26afdeea3e27b941a62
+commit cd569377cda9b5a4ee00c0137db14f625c76c40f
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Thu May 17 11:02:02 2012 +1000
 
@@ -59,9 +1306,8 @@ Date:   Thu May 17 11:02:02 2012 +1000
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
     Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
-    (cherry picked from commit cd569377cda9b5a4ee00c0137db14f625c76c40f)
 
-commit 739175d198372a3226ce061b118d8fe5bbc8f6bf
+commit 0054b144f3daf00e46a35b2f165befb209df94fc
 Author: Chase Douglas <chase.douglas@canonical.com>
 Date:   Wed May 16 07:49:25 2012 -0700
 
@@ -74,9 +1320,8 @@ Date:   Wed May 16 07:49:25 2012 -0700
     
     Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
-    (cherry picked from commit 0054b144f3daf00e46a35b2f165befb209df94fc)
 
-commit 67a02d676c96d5b3d4729290cd96af0201eb76bb
+commit 53557a5cab1e253dc8f4393207954ae0fe76068f
 Author: Chun Yang <Chuck.Yang@gmail.com>
 Date:   Tue May 15 14:51:42 2012 -0500
 
@@ -91,9 +1336,19 @@ Date:   Tue May 15 14:51:42 2012 -0500
     
     Signed-off-by: Chun Yang <Chuck.Yang@gmail.com>
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
-    (cherry picked from commit 53557a5cab1e253dc8f4393207954ae0fe76068f)
 
-commit 23e87b57bb874326c88a7ad7292bec51959fb876
+commit 1ee5bd0af6ac5c1b95d99f27f407223cd460fdb8
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue May 15 11:22:43 2012 +1000
+
+    Remove defunct HAVE_MULTITOUCH compiler warning
+    
+    Seems like this was a rebase gone wrong, HAVE_MULTITOUCH was removed in
+    3430f4af41184752d698dcbf4919469e36b3216c
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit 55fc42e7c9b4948cadd4f98ef7b6a3b12e268e3e
 Author: Chase Douglas <chase.douglas@canonical.com>
 Date:   Mon May 14 10:20:01 2012 -0700
 
@@ -110,9 +1365,8 @@ Date:   Mon May 14 10:20:01 2012 -0700
     
     Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
-    (cherry picked from commit 55fc42e7c9b4948cadd4f98ef7b6a3b12e268e3e)
 
-commit 23065a974e5dcdf0d6a436a0547bb7887d306a6f
+commit 77d766b1d535dff9a27c7db343ede85d9f44850b
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Fri May 11 12:27:39 2012 +1000
 
@@ -126,26 +1380,16 @@ Date:   Fri May 11 12:27:39 2012 +1000
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
     Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
-    (cherry picked from commit 77d766b1d535dff9a27c7db343ede85d9f44850b)
 
-commit e0f5688994baa85a8c658120681575cdd0ba2a58
-Author: Peter Hutterer <peter.hutterer@who-t.net>
-Date:   Fri May 11 10:30:21 2012 +1000
-
-    synaptics 1.6.1
-    
-    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
-
-commit 7f2d9d88204c62de3cb63b48001b9e2408d3a20d
+commit 0352c67fa2a7224b5a3bf03a934b3c7af42b4f51
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Fri May 11 10:54:47 2012 +1000
 
     tools: coasting speed is not capped at 20, cap it at 255
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
-    (cherry picked from commit 0352c67fa2a7224b5a3bf03a934b3c7af42b4f51)
 
-commit ace20a02c371478f6a9d224dfd31ea219d91fc46
+commit 0de4445ff8e75aab208faf6383e76045934c6720
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Wed May 9 14:26:40 2012 +1000
 
@@ -162,9 +1406,8 @@ Date:   Wed May 9 14:26:40 2012 +1000
     http://bugzilla.redhat.com/813686
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
-    (cherry picked from commit 0de4445ff8e75aab208faf6383e76045934c6720)
 
-commit 04d24116db59872d4cd00f38a0d1c87957fe4914
+commit a1d6784d790f081f8a6ea3a10d3cfa578aa10d5b
 Author: Peter Hutterer <peter.hutterer@who-t.net>
 Date:   Wed May 9 12:23:46 2012 +1000
 
@@ -186,7 +1429,145 @@ Date:   Wed May 9 12:23:46 2012 +1000
     
     Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
     Reviewed-by: Chase Douglas <chase.douglas@canonical.com>
-    (cherry picked from commit a1d6784d790f081f8a6ea3a10d3cfa578aa10d5b)
+
+commit 4d4d859296b93f1e2bd1c059f5864f19d87de58a
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Tue May 8 08:19:48 2012 +1000
+
+    Rename force_empty parameter to set_slot_empty
+    
+    Original version of d13e83b921a398b9472b07874cf5061c8a0ea6a6 had
+    'force_empty', the rename only covered the definition, not the declaration
+    of the function.
+    
+    No functional changes.
+    
+    Reported-by: Nicola Soranzo <nsoranzo@tiscali.it>
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+commit b6f3ccd40237d2d8df653f0dcba2ca7336c13f2b
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Mar 23 16:27:42 2012 +1000
+
+    Format Makefile.am, drop @DRIVER_NAME@.c usage
+    
+    The driver name doesn't change often enough for this to warrant it.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Acked-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit ebd36c7494062e9f9a47fcd20148de886ebdd46a
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Mar 23 16:25:54 2012 +1000
+
+    Move synaptics.h leftovers to synapticsstr.h, drop synaptics.h
+    
+    This leaves us with a duplicated define for the maxbuttons but I'll live
+    with that for now.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Acked-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 3430f4af41184752d698dcbf4919469e36b3216c
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Mar 23 16:19:18 2012 +1000
+
+    Require xserver 1.12 and inputproto 2.2
+    
+    This drops conditional compilation of multitouch support, smooth scrolling
+    support and old ABIs.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Acked-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 13611cd34e267370690e06bef6a02064927c2078
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Fri Mar 23 16:11:59 2012 +1000
+
+    Update various Red Hat copyrights
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Acked-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 3b02e7fd81da4b100fb9ac32378f6d50f54cf0e2
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Sun Feb 5 22:50:47 2012 +1000
+
+    Drop circular pad support
+    
+    Do such devices still exist?
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Acked-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 0903d99ada1755f11a2a5cbf89a345de896e18ec
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Sun Feb 5 00:54:59 2012 +1000
+
+    Purge scrollbuttons (repeat)
+    
+    I doubt devices that have scrollbuttons are still manufactured. Having
+    untested code around is just asking for trouble.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Acked-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 54f65f3ca1f7a7118bea96915d79acee28721581
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Sun Feb 5 00:46:48 2012 +1000
+
+    Purge edge motion
+    
+    A funny feature, but unreliable and mostly untested.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Acked-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit d14ea867ad5d6f8a758a18223e457e1a56fa6065
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Sun Feb 5 00:42:36 2012 +1000
+
+    Purge fast-taps option
+    
+    This driver has too many options, maintaining them is hard and testing
+    virtually doesn't happen.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Acked-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 2c7eab5a6d28cf8bbf34fba79601dac4e6e37d7e
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Sat Feb 4 23:32:56 2012 +1000
+
+    Drop trackstick emulation mode
+    
+    "Trackstick emulation mode? That exists?" I hear you say? Yes, indeed. Well,
+    no, not anymore. This driver is already unmaintainable without features like
+    this.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Acked-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 83d88b253139f9c92d619e7ad7c3981138893536
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Sat Feb 4 23:35:53 2012 +1000
+
+    Bury shm - or what was left of it
+    
+    SHM configuration was removed in Apr 2009 (c09a3d50e9), since then it has
+    only been usedful for debugging. And we have better tools (evtest) for
+    debugging hardware events.
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+    Acked-by: Chase Douglas <chase.douglas@canonical.com>
+
+commit 6dea359bc8f507eb46293f7fe5041b0cd6d0dbaa
+Author: Peter Hutterer <peter.hutterer@who-t.net>
+Date:   Thu May 10 09:24:56 2012 +1000
+
+    Bump to 1.6.99
+    
+    Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
 
 commit 4e8ddb3a6f1ba1f7642f0a23d6f22a8c40d68cf0
 Author: Peter Hutterer <peter.hutterer@who-t.net>
