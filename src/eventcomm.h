@@ -38,10 +38,9 @@
 
 struct eventcomm_proto_data;
 
-extern struct eventcomm_proto_data *EventProtoDataAlloc(void);
+extern struct eventcomm_proto_data *EventProtoDataAlloc(int fd);
 
 extern Bool
-
 EventReadHwState(InputInfoPtr pInfo,
                  struct CommData *comm, struct SynapticsHwState *hwRet);
 

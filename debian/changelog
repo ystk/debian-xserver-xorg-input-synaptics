@@ -1,3 +1,70 @@
+xserver-xorg-input-synaptics (1.8.0-1) unstable; urgency=medium
+
+  [ Julien Cristau ]
+  * Remove Cyril from Uploaders.
+
+ -- maximilian attems <maks@debian.org>  Sat, 12 Jul 2014 19:20:04 +0200
+
+xserver-xorg-input-synaptics (1.8.0-1~exp2) experimental; urgency=medium
+
+  * Mark libevdev-dev build dependency [linux-any]. (closes: #749286)
+    Thanks to Pino Toscano <pino@debian.org>.
+
+ -- maximilian attems <maks@debian.org>  Wed, 28 May 2014 05:46:25 +0200
+
+xserver-xorg-input-synaptics (1.8.0-1~exp1) experimental; urgency=medium
+
+  [ Maarten Lankhorst ]
+  * Drop libxtst-dev conflicts, add libevdev-dev.
+
+  [ maximilian attems ]
+  * New upstream release (closes: #743488).
+    - Revert "Purge scrollbuttons (repeat)" (closes: #722006).
+    - support newer Thinkpads (closes: #705807)
+  * add myself to Uploaders.
+
+ -- maximilian attems <maks@debian.org>  Fri, 23 May 2014 18:27:28 +0200
+
+xserver-xorg-input-synaptics (1.7.3-1) unstable; urgency=medium
+
+  [ Michele Cane ]
+  * New upstream release.
+
+ -- Julien Cristau <jcristau@debian.org>  Sun, 19 Jan 2014 11:46:16 +0100
+
+xserver-xorg-input-synaptics (1.7.2-1) unstable; urgency=medium
+
+  [ Michele Cane ]
+  * New upstream release.
+  * Bump Standard-Version to 3.9.5, no changes needed.
+  * Refresh patches.
+
+  [ Julien Cristau ]
+  * Disable silent build rules and silent test failures.
+
+ -- Julien Cristau <jcristau@debian.org>  Sun, 15 Dec 2013 19:07:48 +0100
+
+xserver-xorg-input-synaptics (1.7.1-2) unstable; urgency=low
+
+  * Add Breaks on kde-config-touchpad (<< 0.8.1-2~) because of #722058
+    (closes: #722006).
+
+ -- Julien Cristau <jcristau@debian.org>  Sun, 22 Sep 2013 16:17:34 +0200
+
+xserver-xorg-input-synaptics (1.7.1-1) unstable; urgency=low
+
+  [ Maarten Lankhorst ]
+  * New upstream release.
+  * Add -dbg package
+
+  [ Timo Aaltonen ]
+  * control: Bump policy to 3.9.4, no changes.
+
+  [ Julien Cristau ]
+  * Don't use BUG_RETURN_VAL if it's not defined (added in xserver 1.13)
+
+ -- Julien Cristau <jcristau@debian.org>  Thu, 05 Sep 2013 22:27:28 +0200
+
 xserver-xorg-input-synaptics (1.6.2-2) unstable; urgency=low
 
   * Pull latest synaptics-1.6-branch:
@@ -55,6 +122,14 @@ xserver-xorg-input-synaptics (1.5.99.901-1) unstable; urgency=low
   * Multitouch isn't enabled yet (it would require a newer server anyway).
 
  -- Cyril Brulebois <kibi@debian.org>  Tue, 20 Mar 2012 21:40:10 +0000
+
+xserver-xorg-input-synaptics (1.5.0+git20120101-1) experimental; urgency=low
+
+  * New upstream snapshot:
+    - Merge from upstream master up to 9f9b55ab55.
+  * Build against Xserver 1.12 RC1.
+
+ -- Cyril Brulebois <kibi@debian.org>  Sun, 01 Jan 2012 07:54:51 +0100
 
 xserver-xorg-input-synaptics (1.5.0-2) unstable; urgency=low
 
